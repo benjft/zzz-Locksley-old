@@ -53,6 +53,7 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
         <PackageReference Include="sqlite-net-pcl" Version="1.9.141-beta" />
+        <PackageReference Include="SQLiteNetExtensions.Async" Version="2.1.0" />
         <PackageReference Include="SQLitePCLRawEx.bundle_green" Version="2.1.2-pre20220801070813" />
     </ItemGroup>
 
