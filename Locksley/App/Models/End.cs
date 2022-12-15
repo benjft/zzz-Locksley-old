@@ -1,14 +1,7 @@
-﻿using SQLite;
-using SQLiteNetExtensions.Attributes;
-
-namespace Locksley.App.Models;
+﻿namespace Locksley.App.Models;
 
 public record End {
-    [PrimaryKey, AutoIncrement]
-    public int Id { get; set; }
+    public int EndId { get; set; }
 
-    [TextBlob(nameof(ScoresBlob))]
-    public List<int> Scores { get; set; } = new();
-    
-    public string ScoresBlob { get; set; } = default!;
+    public virtual ICollection<ArrowValue> Scores { get; set; } = new List<ArrowValue>();
 }

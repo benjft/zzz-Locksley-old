@@ -1,5 +1,3 @@
-﻿namespace Locksley.App.ViewModels; 
+﻿namespace Locksley.App.ViewModels;
 
-public class MainViewModel {
-    
-}
+public class MainViewModel { }

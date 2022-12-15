@@ -1,8 +1,6 @@
 ﻿using Locksley.App.Attributes;
 
-namespace Locksley.App.Services.Interfaces; 
+namespace Locksley.App.Services.Interfaces;
 
 [Service(Lifetime = ServiceLifetime.Singleton)]
-public interface INavigationService {
-    
-}
+public interface INavigationService { }
