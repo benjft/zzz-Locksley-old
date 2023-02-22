@@ -37,8 +37,8 @@ public static class ServiceExtensions {
 
         foreach (var (k, v) in implementations) {
             var serviceAttribute =
-                v.GetCustomAttribute<ServiceAttribute>() ??
-                k.GetCustomAttribute<ServiceAttribute>();
+                v.GetCustomAttribute<ServiceLifetimeAttribute>() ??
+                k.GetCustomAttribute<ServiceLifetimeAttribute>();
             switch (serviceAttribute?.Lifetime) {
                 case ServiceLifetime.Singleton:
                     services.AddSingleton(k, v);
@@ -46,8 +46,8 @@ public static class ServiceExtensions {
                 case ServiceLifetime.Scoped:
                     services.AddScoped(k, v);
                     break;
-                case null:
                 case ServiceLifetime.Transient:
+                case null:
                 default:
                     services.AddTransient(k, v);
                     break;

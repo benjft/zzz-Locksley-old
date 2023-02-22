@@ -1,11 +1,21 @@
-﻿namespace Locksley.App.Models;
+﻿using Locksley.App.Models.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
-public record ScoreSheet {
+namespace Locksley.App.Models;
+
+// ReSharper disable once ClassWithVirtualMembersNeverInherited.Global
+public record ScoreSheet : IHasRelationship {
     public int ScoreSheetId { get; set; }
 
     public string Title { get; set; } = "";
 
     public DateTime CreatedDate { get; set; } = DateTime.Now;
 
-    public virtual ICollection<Round> Rounds { get; set; } = new List<Round>();
+    public virtual ICollection<Section> Sections { get; set; } = new List<Section>();
+    
+    public static void ConfigureRelationships(ModelBuilder modelBuilder) {
+        modelBuilder.Entity<ScoreSheet>()
+            .HasMany(ss => ss.Sections)
+            .WithOne();
+    }
 }

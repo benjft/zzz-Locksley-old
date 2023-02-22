@@ -2,5 +2,5 @@
 
 namespace Locksley.App.Services.Interfaces;
 
-[Service(Lifetime = ServiceLifetime.Singleton)]
+[ServiceLifetime(Lifetime = ServiceLifetime.Singleton)]
 public interface INavigationService { }

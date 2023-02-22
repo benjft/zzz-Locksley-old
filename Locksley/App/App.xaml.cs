@@ -1,9 +1,10 @@
-﻿using Locksley.App.Views;
+﻿using Locksley.App.Services.Interfaces;
+using Locksley.App.Views;
 
 namespace Locksley.App;
 
 public partial class App {
-    public App(MainPage mainPage) {
+    public App(MainPage mainPage, IDataProvider dataProvider) {
         InitializeComponent();
 
         MainPage = mainPage;

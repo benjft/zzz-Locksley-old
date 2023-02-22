@@ -1,22 +1,29 @@
-﻿using Locksley.App.Models;
+﻿using System.Xml.Linq;
+using Locksley.App.Attributes;
+using Locksley.App.Converters;
+using Locksley.App.Helpers;
+using Locksley.App.Models;
+using Locksley.App.Models.Interfaces;
 using Locksley.App.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.Extensions.Logging;
 
 namespace Locksley.App.Services;
 
+[ServiceLifetime(Lifetime = ServiceLifetime.Singleton)]
 public sealed class SqLiteDataProvider : DbContext, IDataProvider {
 
     public DbSet<ScoreSheet> ScoreSheets { get; set; }
 
     private readonly ILogger _log;
     
-    public SqLiteDataProvider(ILogger log) {
+    public SqLiteDataProvider(ILogger<SqLiteDataProvider> log) {
+        _log = log;
 #if IOS
         SQLitePCL.Batteries_V2.Init(); // initializes sqlite on iOS
 #endif
         Database.EnsureCreated();
-        _log = log;
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
@@ -25,35 +32,40 @@ public sealed class SqLiteDataProvider : DbContext, IDataProvider {
             .UseSqlite($"Filename={Constants.DatabasePath}");
     }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder) {
-        _log.LogInformation($"Creating fk for ScoreSheet");
-        modelBuilder.Entity<ScoreSheet>()
-            .HasMany(ss => ss.Rounds)
-            .WithOne();
+    private void RegisterRelationships(ModelBuilder modelBuilder) {
+        var modelNamespace = typeof(ScoreSheet).Namespace;
+        var relationshipTypes = ReflectionHelper.GetAllClassesInNamespace(modelNamespace)
+            .Where(t => typeof(IHasRelationship).IsAssignableFrom(t));
         
-        _log.LogInformation("Creating fk for Round");
-        modelBuilder.Entity<Round>()
-            .HasOne(r => r.TargetFace)
-            .WithMany();
-        modelBuilder.Entity<Round>()
-            .HasMany(r => r.Ends)
-            .WithOne();
+        foreach (var type in relationshipTypes) {
+            _log.LogDebug("Running \"ConfigureRelationships\" for type \"{Name}\"", type.Name);
+            type.GetMethod(nameof(IHasRelationship.ConfigureRelationships))?.Invoke(null, new object[] {modelBuilder});
+        }
+    }
+    
+    protected override void OnModelCreating(ModelBuilder modelBuilder) {
+        RegisterRelationships(modelBuilder);
+    }
 
-        _log.LogInformation("Creating fk for TargetFace");
-        modelBuilder.Entity<TargetFace>()
-            .HasMany(tf => tf.ScoreZones)
-            .WithMany()
-            .UsingEntity("TargetFace_ScoreZones");
+    private void RegisterConverters(ModelConfigurationBuilder configurationBuilder) {
+        var converterNamespace = typeof(XElementConverter).Namespace;
+        var valueConverters = ReflectionHelper.GetAllSubclassesInNamespace<ValueConverter>(converterNamespace);
+        
+        foreach (var converterType in valueConverters) {
+            var targetType = converterType?.BaseType?.GetGenericArguments()[0] ?? throw new NullReferenceException();
+            
+            _log.LogDebug("Adding converter \"{Converter}\" for type \"{Target}\"", converterType.Name, targetType.Name);
+            configurationBuilder.Properties(targetType).HaveConversion(converterType);
+        }
+    }
 
-        _log.LogInformation("Creating fk for End");
-        modelBuilder.Entity<End>()
-            .HasMany(e => e.Scores)
-            .WithOne();
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder) {
+        RegisterConverters(configurationBuilder);
     }
 
     public IEnumerable<ScoreSheet> GetAllScoreSheets() => ScoreSheets;
 
     public void LoadScoreSheet(ref ScoreSheet scoreSheet) {
-        Entry(scoreSheet).Collection(ss => ss.Rounds).Load();
+        Entry(scoreSheet).Collection(ss => ss.Sections).Load();
     }
 }
