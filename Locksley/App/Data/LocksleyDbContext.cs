@@ -1,37 +1,50 @@
-﻿using System.Xml.Linq;
-using Locksley.App.Attributes;
+﻿using Locksley.App.Attributes;
 using Locksley.App.Converters;
+using Locksley.App.Data.Models;
+using Locksley.App.Data.Models.Interfaces;
 using Locksley.App.Helpers;
-using Locksley.App.Models;
-using Locksley.App.Models.Interfaces;
-using Locksley.App.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.Extensions.Logging;
 
-namespace Locksley.App.Services;
+namespace Locksley.App.Data;
 
 [ServiceLifetime(Lifetime = ServiceLifetime.Singleton)]
-public sealed class SqLiteDataProvider : DbContext, IDataProvider {
-
-    public DbSet<ScoreSheet> ScoreSheets { get; set; }
+public sealed class LocksleyDbContext : DbContext {
 
     private readonly ILogger _log;
-    
-    public SqLiteDataProvider(ILogger<SqLiteDataProvider> log) {
+    private readonly DbContextOptions<LocksleyDbContext> _contextOptions;
+
+    public LocksleyDbContext(
+        DbContextOptions<LocksleyDbContext> contextOptions, 
+        ILogger<LocksleyDbContext> log
+    ) : base(contextOptions) {
         _log = log;
-#if IOS
+        _contextOptions = contextOptions;
+        
+        #if IOS
         SQLitePCL.Batteries_V2.Init(); // initializes sqlite on iOS
-#endif
+        #endif
         Database.EnsureCreated();
     }
 
+    #region base class overrides
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
         optionsBuilder
             .UseLazyLoadingProxies()
             .UseSqlite($"Filename={Constants.DatabasePath}");
     }
+    
+    protected override void OnModelCreating(ModelBuilder modelBuilder) {
+        RegisterRelationships(modelBuilder);
+    }
 
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder) {
+        RegisterConverters(configurationBuilder);
+    }
+
+    #endregion
+    #region private helpers
     private void RegisterRelationships(ModelBuilder modelBuilder) {
         var modelNamespace = typeof(ScoreSheet).Namespace;
         var relationshipTypes = ReflectionHelper.GetAllClassesInNamespace(modelNamespace)
@@ -42,30 +55,17 @@ public sealed class SqLiteDataProvider : DbContext, IDataProvider {
             type.GetMethod(nameof(IHasRelationship.ConfigureRelationships))?.Invoke(null, new object[] {modelBuilder});
         }
     }
-    
-    protected override void OnModelCreating(ModelBuilder modelBuilder) {
-        RegisterRelationships(modelBuilder);
-    }
 
     private void RegisterConverters(ModelConfigurationBuilder configurationBuilder) {
         var converterNamespace = typeof(XElementConverter).Namespace;
         var valueConverters = ReflectionHelper.GetAllSubclassesInNamespace<ValueConverter>(converterNamespace);
         
         foreach (var converterType in valueConverters) {
-            var targetType = converterType?.BaseType?.GetGenericArguments()[0] ?? throw new NullReferenceException();
+            var targetType = converterType.BaseType?.GetGenericArguments()[0] ?? throw new NullReferenceException();
             
             _log.LogDebug("Adding converter \"{Converter}\" for type \"{Target}\"", converterType.Name, targetType.Name);
             configurationBuilder.Properties(targetType).HaveConversion(converterType);
         }
     }
-
-    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder) {
-        RegisterConverters(configurationBuilder);
-    }
-
-    public IEnumerable<ScoreSheet> GetAllScoreSheets() => ScoreSheets;
-
-    public void LoadScoreSheet(ref ScoreSheet scoreSheet) {
-        Entry(scoreSheet).Collection(ss => ss.Sections).Load();
-    }
+    #endregion
 }

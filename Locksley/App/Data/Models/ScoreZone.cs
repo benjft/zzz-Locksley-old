@@ -1,6 +1,6 @@
 ﻿using System.Xml.Linq;
 
-namespace Locksley.App.Models;
+namespace Locksley.App.Data.Models;
 
 public record ScoreZone {
     public int ScoreZoneId { get; set; }

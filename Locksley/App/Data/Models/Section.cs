@@ -1,8 +1,8 @@
-﻿using Locksley.App.Helpers.Enums;
-using Locksley.App.Models.Interfaces;
+﻿using Locksley.App.Data.Models.Interfaces;
+using Locksley.App.Helpers.Enums;
 using Microsoft.EntityFrameworkCore;
 
-namespace Locksley.App.Models;
+namespace Locksley.App.Data.Models;
 
 // ReSharper disable once ClassWithVirtualMembersNeverInherited.Global
 public record Section : IHasRelationship {

@@ -4,7 +4,7 @@ using Locksley.App.Views;
 namespace Locksley.App;
 
 public partial class App {
-    public App(MainPage mainPage, IDataProvider dataProvider) {
+    public App(MainPage mainPage) {
         InitializeComponent();
 
         MainPage = mainPage;
