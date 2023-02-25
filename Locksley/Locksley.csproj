@@ -82,8 +82,4 @@
         <AdditionalFiles Include="App\Views\MainPage.xaml" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="App\Models\Interfaces" />
-    </ItemGroup>
-
 </Project>

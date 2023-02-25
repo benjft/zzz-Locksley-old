@@ -13,20 +13,25 @@ namespace Locksley.App.Data;
 public sealed class LocksleyDbContext : DbContext {
 
     private readonly ILogger _log;
-    private readonly DbContextOptions<LocksleyDbContext> _contextOptions;
 
     public LocksleyDbContext(
         DbContextOptions<LocksleyDbContext> contextOptions, 
         ILogger<LocksleyDbContext> log
     ) : base(contextOptions) {
         _log = log;
-        _contextOptions = contextOptions;
         
         #if IOS
         SQLitePCL.Batteries_V2.Init(); // initializes sqlite on iOS
         #endif
         Database.EnsureCreated();
     }
+
+    #region public properties and methods
+
+    public DbSet<ScoreSheet> ScoreSheets { get; set; }
+    public DbSet<TargetFace> TargetFaces { get; set; }
+
+    #endregion
 
     #region base class overrides
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {

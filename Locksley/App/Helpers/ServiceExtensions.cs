@@ -2,14 +2,14 @@
 using Locksley.App.Attributes;
 using Locksley.App.Data;
 using Locksley.App.Services;
-using Locksley.App.Services.Interfaces;
 using Locksley.App.ViewModels;
 using Locksley.App.Views;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+
 #if ANDROID
 using Locksley.Platforms.Android.Services;
 #endif
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace Locksley.App.Helpers;
 
@@ -33,34 +33,49 @@ public static class ServiceExtensions {
     }
 
     public static IServiceCollection AddServices(this IServiceCollection services) {
-        var serviceInterfacesNamespace = typeof(INavigationService).Namespace;
-        var interfaces = ReflectionHelper.GetAllInterfacesInNamespace(serviceInterfacesNamespace);
-
         var servicesNamespace = typeof(NavigationService).Namespace;
         var classes = ReflectionHelper.GetAllClassesInNamespace(servicesNamespace);
 
-        var implementations = interfaces.ToDictionary(i => i, i => classes.Single(i.IsAssignableFrom));
+        var clsInterfaces = classes.ToDictionary(
+            c => c, 
+            c => c.GetInterfaces()
+                .Where(i => i.GetCustomAttribute<ServiceLifetimeAttribute>() != null)
+            );
 
-        foreach (var (k, v) in implementations) {
-            var serviceAttribute =
-                v.GetCustomAttribute<ServiceLifetimeAttribute>() ??
-                k.GetCustomAttribute<ServiceLifetimeAttribute>();
-            switch (serviceAttribute?.Lifetime) {
-                case ServiceLifetime.Singleton:
-                    services.AddSingleton(k, v);
-                    break;
-                case ServiceLifetime.Scoped:
-                    services.AddScoped(k, v);
-                    break;
-                case ServiceLifetime.Transient:
-                case null:
-                default:
-                    services.AddTransient(k, v);
-                    break;
+        foreach (var (cls, interfaces) in clsInterfaces) {
+            var itfArr = interfaces as Type[] ?? interfaces.ToArray();
+            
+            var serviceLifetime =
+                cls.GetCustomAttribute<ServiceLifetimeAttribute>()?.Lifetime ??
+                itfArr.Select(j => j.GetCustomAttribute<ServiceLifetimeAttribute>()).Min(lta => lta?.Lifetime) ?? 
+                ServiceLifetime.Transient;
+
+            Func<IServiceProvider, object>? clsFactory = null;
+            if (itfArr.Length > 1 || cls.GetCustomAttribute<ServiceLifetimeAttribute>() != null) {
+                services.RegisterService(serviceLifetime, cls);
+                clsFactory = x => x.GetRequiredService(cls);
+            }
+            
+            foreach (var itf in itfArr) {
+                if (clsFactory != null) {
+                    services.AddTransient(itf, clsFactory);
+                } else {
+                    services.RegisterService(serviceLifetime, cls, itf);
+                }
             }
         }
-
+        
         return services;
+    }
+
+    private static void RegisterService(this IServiceCollection services, ServiceLifetime lifetime, Type cls, Type? itf = null) {
+        itf ??= cls;
+        _ = lifetime switch {
+            ServiceLifetime.Singleton => services.AddSingleton(itf, cls),
+            ServiceLifetime.Scoped => services.AddScoped(itf, cls),
+            ServiceLifetime.Transient => services.AddTransient(itf, cls),
+            _ => services.AddTransient(itf, cls)
+        };
     }
 
     public static IServiceCollection AddDatabase(this IServiceCollection services) {
