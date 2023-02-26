@@ -4,10 +4,10 @@ using Locksley.App.Services.Interfaces;
 
 namespace Locksley.App.Services; 
 
-public class ScoreSheetRepository : IRepository<ScoreSheet> {
+public class ScoreSheetDataProvider : IDataProvider<ScoreSheet> {
     private readonly LocksleyDbContext _dbContext;
 
-    public ScoreSheetRepository(LocksleyDbContext dbContext) {
+    public ScoreSheetDataProvider(LocksleyDbContext dbContext) {
         _dbContext = dbContext;
     }
 

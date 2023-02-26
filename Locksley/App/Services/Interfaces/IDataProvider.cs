@@ -3,7 +3,7 @@
 namespace Locksley.App.Services.Interfaces; 
 
 [ServiceLifetime(Lifetime = ServiceLifetime.Singleton)]
-public interface IRepository<T> where T : class {
+public interface IDataProvider<T> where T : class {
     T? Get(int id);
     IEnumerable<T> GetAll();
     IEnumerable<T> GetPage(int pageNumber, int pageSize);

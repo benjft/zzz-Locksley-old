@@ -2,11 +2,11 @@
 using Locksley.App.Attributes;
 using Locksley.App.Data;
 using Locksley.App.Services;
+using Locksley.App.Services.Interfaces;
 using Locksley.App.ViewModels;
 using Locksley.App.Views;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-
 #if ANDROID
 using Locksley.Platforms.Android.Services;
 #endif
@@ -27,7 +27,8 @@ public static class ServiceExtensions {
         var viewModelsNamespace = typeof(MainViewModel).Namespace;
         var viewModelTypes = ReflectionHelper.GetAllClassesInNamespace(viewModelsNamespace);
 
-        foreach (var viewModelType in viewModelTypes) services.AddTransient(viewModelType);
+        foreach (var viewModelType in viewModelTypes)
+            services.RegisterService(ServiceLifetime.Transient, viewModelType);
 
         return services;
     }
@@ -37,17 +38,17 @@ public static class ServiceExtensions {
         var classes = ReflectionHelper.GetAllClassesInNamespace(servicesNamespace);
 
         var clsInterfaces = classes.ToDictionary(
-            c => c, 
+            c => c,
             c => c.GetInterfaces()
                 .Where(i => i.GetCustomAttribute<ServiceLifetimeAttribute>() != null)
-            );
+        );
 
         foreach (var (cls, interfaces) in clsInterfaces) {
             var itfArr = interfaces as Type[] ?? interfaces.ToArray();
-            
+
             var serviceLifetime =
                 cls.GetCustomAttribute<ServiceLifetimeAttribute>()?.Lifetime ??
-                itfArr.Select(j => j.GetCustomAttribute<ServiceLifetimeAttribute>()).Min(lta => lta?.Lifetime) ?? 
+                itfArr.Select(j => j.GetCustomAttribute<ServiceLifetimeAttribute>()).Min(lta => lta?.Lifetime) ??
                 ServiceLifetime.Transient;
 
             Func<IServiceProvider, object>? clsFactory = null;
@@ -55,27 +56,53 @@ public static class ServiceExtensions {
                 services.RegisterService(serviceLifetime, cls);
                 clsFactory = x => x.GetRequiredService(cls);
             }
-            
-            foreach (var itf in itfArr) {
-                if (clsFactory != null) {
+
+            foreach (var itf in itfArr)
+                if (clsFactory != null)
                     services.AddTransient(itf, clsFactory);
-                } else {
+                else
                     services.RegisterService(serviceLifetime, cls, itf);
-                }
-            }
         }
-        
+
         return services;
     }
 
-    private static void RegisterService(this IServiceCollection services, ServiceLifetime lifetime, Type cls, Type? itf = null) {
+    private static void RegisterService(this IServiceCollection services, ServiceLifetime lifetime, Type cls,
+        Type? itf = null) {
         itf ??= cls;
+
+        if (services.RegisterFactoryService(lifetime, cls, itf))
+            return;
+
         _ = lifetime switch {
             ServiceLifetime.Singleton => services.AddSingleton(itf, cls),
             ServiceLifetime.Scoped => services.AddScoped(itf, cls),
             ServiceLifetime.Transient => services.AddTransient(itf, cls),
             _ => services.AddTransient(itf, cls)
         };
+    }
+
+    private static bool RegisterFactoryService(this IServiceCollection services, ServiceLifetime lifetime, Type cls,
+        Type itf) {
+        if (!typeof(IHasFactory<>).MakeGenericType(cls).IsAssignableFrom(cls))
+            return false;
+
+        var factoryInfo = cls.GetMethod(nameof(IHasFactory<object>.CreateNewInstance));
+        if (factoryInfo == null)
+            return false;
+
+        object Factory(IServiceProvider sp) {
+            return factoryInfo.Invoke(null, new object?[] {sp})!;
+        }
+
+        _ = lifetime switch {
+            ServiceLifetime.Singleton => services.AddSingleton(itf, Factory),
+            ServiceLifetime.Scoped => services.AddScoped(itf, Factory),
+            ServiceLifetime.Transient => services.AddTransient(itf, Factory),
+            _ => services.AddTransient(itf, Factory)
+        };
+
+        return true;
     }
 
     public static IServiceCollection AddDatabase(this IServiceCollection services) {
@@ -86,23 +113,22 @@ public static class ServiceExtensions {
     }
 
     public static IServiceCollection AddOtherServices(this IServiceCollection services) {
-        
-        #if ANDROID
+#if ANDROID
         services.AddLogging(configure => {
-            #if DEBUG
+#if DEBUG
             const LogLevel logLevel = LogLevel.Debug;
-            #else
+#else
             const LogLevel logLevel = LogLevel.Information;
-            #endif
+#endif
             configure.AddProvider(new AndroidLoggingProvider())
                 .AddFilter((_, l) => l >= logLevel);
         });
-        #else
+#else
         services.AddLogging(configure => {
             configure.AddDebug();
             configure.AddConsole();
         });
-        #endif
+#endif
         return services;
     }
 }

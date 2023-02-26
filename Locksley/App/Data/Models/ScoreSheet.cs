@@ -10,9 +10,10 @@ public record ScoreSheet : IHasRelationship {
     public string Title { get; set; } = "";
 
     public DateTime CreatedDate { get; set; } = DateTime.Now;
+    public string DateString => CreatedDate.ToShortDateString();
 
     public virtual ICollection<Section> Sections { get; set; } = new List<Section>();
-    
+
     public static void ConfigureRelationships(ModelBuilder modelBuilder) {
         modelBuilder.Entity<ScoreSheet>()
             .HasMany(ss => ss.Sections)
