@@ -1,4 +1,6 @@
-﻿using BenJFT.Locksley.Data.Models;
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using BenJFT.Locksley.Data.Models;
 using BenJFT.Locksley.Data.Providers.Interfaces;
 
 namespace BenJFT.Locksley.Data.Providers;
@@ -38,6 +40,8 @@ public class ScoreSheetDataProvider : IDataProvider<ScoreSheet> {
         _dbContext.ScoreSheets.AddRange(items.Where(i => !_dbContext.Entry(i).IsKeySet));
 
         _dbContext.SaveChanges();
+        
+        OnPropertyChanged(nameof(_dbContext));
     }
 
     public void Delete(ScoreSheet item) {
@@ -47,5 +51,13 @@ public class ScoreSheetDataProvider : IDataProvider<ScoreSheet> {
     public void DeleteMany(IEnumerable<ScoreSheet> items) {
         _dbContext.RemoveRange(items);
         _dbContext.SaveChanges();
+        
+        OnPropertyChanged(nameof(_dbContext));
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null) {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

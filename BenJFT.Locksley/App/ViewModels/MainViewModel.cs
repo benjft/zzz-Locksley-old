@@ -1,32 +1,32 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows.Input;
 using BenJFT.Locksley.Data.Models;
 using BenJFT.Locksley.Data.Providers.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace BenJFT.Locksley.App.ViewModels;
 
 public class MainViewModel : BaseViewModel {
     private readonly IDataProvider<ScoreSheet> _scoreSheetProvider;
+    private readonly ILogger<MainViewModel> _log;
 
-    public MainViewModel(IDataProvider<ScoreSheet> scoreSheetProvider) {
+    public MainViewModel(
+        IDataProvider<ScoreSheet> scoreSheetProvider,
+        ILogger<MainViewModel> log) {
         _scoreSheetProvider = scoreSheetProvider;
+        _log = log;
+        
+        _scoreSheetProvider.PropertyChanged += OnScoreSheetsChanged;
     }
 
-    public IEnumerable<ScoreSheet> ScoreSheets { get; } = new ScoreSheet[] {
-        new() {Title = "Score Sheet 1", CreatedDate = DateTime.Now},
-        new() {Title = "Score Sheet 2", CreatedDate = DateTime.Now + TimeSpan.FromDays(5)}
-    }; //_scoreSheetProvider.GetAll();
+    public IEnumerable<ScoreSheet> ScoreSheets => _scoreSheetProvider.GetAll();
 
-    public override event PropertyChangedEventHandler? PropertyChanged;
-
-    private void OnPropertyChanged([CallerMemberName] string? propertyName = null) {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    private void OnScoreSheetsChanged(object? sender, PropertyChangedEventArgs args) {
+        OnPropertyChanged(nameof(ScoreSheets));
     }
 
-    private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null) {
-        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
-        field = value;
-        OnPropertyChanged(propertyName);
-        return true;
+    public async Task NewScoreSheet() {
+        _log.LogDebug("Creating new score sheet");
     }
 }

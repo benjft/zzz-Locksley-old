@@ -1,6 +1,8 @@
-﻿namespace BenJFT.Locksley.Data.Providers.Interfaces;
+﻿using System.ComponentModel;
 
-public interface IDataProvider<T> where T : class {
+namespace BenJFT.Locksley.Data.Providers.Interfaces;
+
+public interface IDataProvider<T> : INotifyPropertyChanged where T : class {
     T? Get(int id);
     IEnumerable<T> GetAll();
     IEnumerable<T> GetPage(int pageNumber, int pageSize);

@@ -7,12 +7,16 @@
              x:Class="BenJFT.Locksley.App.Views.MainPage"
              x:DataType="viewModels:MainViewModel">
 
-    <ListView ItemsSource="{Binding ScoreSheets}">
-        <ListView.ItemTemplate>
-            <DataTemplate x:DataType="models:ScoreSheet">
-                <TextCell Text="{Binding Title}"
-                          Detail="{Binding DateString}" />
-            </DataTemplate>
-        </ListView.ItemTemplate>
-    </ListView>
+    <StackLayout>
+        <ListView ItemsSource="{Binding ScoreSheets}">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="models:ScoreSheet">
+                    <TextCell Text="{Binding Title}"
+                              Detail="{Binding DateString}" />
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <Button Text="+ New"
+                Clicked="Button_NewScoreSheet"/>
+    </StackLayout>
 </ContentPage>
