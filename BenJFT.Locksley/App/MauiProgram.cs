@@ -15,10 +15,9 @@ public static class MauiProgram {
             });
 
         builder.Services
-            .AddViews()
-            .AddViewModels()
+            .AddCommonServices()
             .AddDataServices()
-            .AddCommonServices();
+            .AddAppServices();
 
         return builder.Build();
     }
