@@ -7,6 +7,20 @@
              x:Class="BenJFT.Locksley.App.Views.NewScoreSheetPage"
              x:DataType="viewModels:NewScoreSheetViewModel">
     <ContentPage.Content>
-        
+        <StackLayout>
+            <TableView Intent="Form">
+                <TableRoot>
+                    <TableSection>
+                        <EntryCell
+                            Label="Title: "
+                            Placeholder="New Score Sheet"
+                            Text="{Binding Title}"/>
+                    </TableSection>
+                </TableRoot>
+            </TableView>
+            <Button
+                Text="Create"
+                Command="{Binding CmdCreateScoreSheet}"/>
+        </StackLayout>
     </ContentPage.Content>
 </ContentPage>

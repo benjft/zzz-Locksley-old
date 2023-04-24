@@ -2,4 +2,5 @@
 
 public interface INavigationProvider {
     Task Navigate<T>() where T : Page;
+    Task Return();
 }
