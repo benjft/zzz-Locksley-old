@@ -1,4 +1,6 @@
 ﻿using System.Reflection;
+using BenJFT.Locksley.App.Services;
+using BenJFT.Locksley.App.Services.Interfaces;
 using BenJFT.Locksley.App.ViewModels;
 using BenJFT.Locksley.Common.Helpers;
 
@@ -23,6 +25,8 @@ public static class ServiceExtensions {
         AddViews(services);
         AddViewModels(services);
 
+        services.AddSingleton<INavigationProvider, NavigationProvider>();
+        
         return services;
     }
 }
