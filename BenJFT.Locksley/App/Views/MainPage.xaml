@@ -17,6 +17,6 @@
             </ListView.ItemTemplate>
         </ListView>
         <Button Text="+ New"
-                Clicked="Button_NewScoreSheet"/>
+                Command="{Binding CmdNewScoreSheet}"/>
     </StackLayout>
 </ContentPage>

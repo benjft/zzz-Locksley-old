@@ -11,6 +11,9 @@ public class MainViewModel : BaseViewModel {
     private readonly IDataProvider<ScoreSheet> _scoreSheetProvider;
     private readonly ILogger<MainViewModel> _log;
 
+    private ICommand? _cmdNewScoreSheet;
+    public ICommand CmdNewScoreSheet => _cmdNewScoreSheet ??= new Command(CreateNewScoreSheet);
+
     public MainViewModel(
         IDataProvider<ScoreSheet> scoreSheetProvider,
         ILogger<MainViewModel> log) {
@@ -25,8 +28,12 @@ public class MainViewModel : BaseViewModel {
     private void OnScoreSheetsChanged(object? sender, PropertyChangedEventArgs args) {
         OnPropertyChanged(nameof(ScoreSheets));
     }
-
-    public async Task NewScoreSheet() {
-        _log.LogDebug("Creating new score sheet");
+ 
+    private async void CreateNewScoreSheet() {
+        var scoreSheet = _scoreSheetProvider.New();
+        var scoreSheetNumber = _scoreSheetProvider.GetAll().Count() + 1;
+        scoreSheet.Title = $"Empty Score Sheet {scoreSheetNumber}";
+        
+        _scoreSheetProvider.Save(scoreSheet);
     }
 }

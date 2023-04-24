@@ -60,4 +60,6 @@ public class ScoreSheetDataProvider : IDataProvider<ScoreSheet> {
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null) {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
+
+    public ScoreSheet New() => new ScoreSheet();
 }

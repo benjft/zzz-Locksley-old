@@ -11,4 +11,5 @@ public interface IDataProvider<T> : INotifyPropertyChanged where T : class {
     void SaveMany(IEnumerable<T> items);
     void Delete(T item);
     void DeleteMany(IEnumerable<T> items);
+    T New();
 }
