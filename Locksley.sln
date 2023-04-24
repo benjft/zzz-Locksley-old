@@ -1,6 +1,10 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Locksley", "Locksley\Locksley.csproj", "{8BD2DD4D-0963-4EC6-8A8B-80900D723E2A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenJFT.Locksley", "BenJFT.Locksley\BenJFT.Locksley.csproj", "{8BD2DD4D-0963-4EC6-8A8B-80900D723E2A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenJFT.Locksley.Common", "BenJFT.Locksley.Common\BenJFT.Locksley.Common.csproj", "{CAE68F86-F319-4531-8ACD-5A7444923471}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenJFT.Locksley.Data", "BenJFT.Locksley.Data\BenJFT.Locksley.Data.csproj", "{CFCFAF4D-5AEC-4A58-AD34-D3A88E3DB3F6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,5 +16,13 @@ Global
 		{8BD2DD4D-0963-4EC6-8A8B-80900D723E2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8BD2DD4D-0963-4EC6-8A8B-80900D723E2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8BD2DD4D-0963-4EC6-8A8B-80900D723E2A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CAE68F86-F319-4531-8ACD-5A7444923471}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CAE68F86-F319-4531-8ACD-5A7444923471}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CAE68F86-F319-4531-8ACD-5A7444923471}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CAE68F86-F319-4531-8ACD-5A7444923471}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFCFAF4D-5AEC-4A58-AD34-D3A88E3DB3F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFCFAF4D-5AEC-4A58-AD34-D3A88E3DB3F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFCFAF4D-5AEC-4A58-AD34-D3A88E3DB3F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFCFAF4D-5AEC-4A58-AD34-D3A88E3DB3F6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
