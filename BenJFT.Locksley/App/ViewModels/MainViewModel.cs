@@ -34,6 +34,6 @@ public class MainViewModel : BaseViewModel {
     }
  
     private async void CreateNewScoreSheet() {
-        await _navigationProvider.Navigate<NewScoreSheetPage>();
+        await _navigationProvider.Push<NewScoreSheetPage>();
     }
 }

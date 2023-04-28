@@ -9,10 +9,27 @@ public class NavigationProvider : INavigationProvider {
         _services = services;
     }
 
-    private INavigation Navigation => Application.Current?.MainPage?.Navigation ??
-                                      throw new NullReferenceException("Failed to instantiate navigation");
+    private static INavigation Navigation => Application.Current?.MainPage?.Navigation ??
+                                             throw new NullReferenceException("Failed to instantiate navigation");
+    
+    public async Task<T> Push<T>(Action<T>? onCreate = null) where T : Page {
+        var page = _services.GetRequiredService<T>();
+        onCreate?.Invoke(page);
+        await Navigation.PushAsync(page, true);
+        return page;
+    }
 
-    public async Task Navigate<T>() where T : Page => await Navigation.PushAsync(_services.GetRequiredService<T>());
+    public async Task<T> InPlace<T>(Action<T>? onCreate = null) where T : Page {
+        var currentPage = Navigation.NavigationStack[^1];
+        var newPage = await Push(onCreate);
+        Navigation.RemovePage(currentPage);
+        
+        return newPage;
+    }
+    
+    public async Task Pop() => await Navigation.PopAsync();
 
-    public async Task Return() => await Navigation.PopAsync();
+    public void Remove(Page page) => Navigation.RemovePage(page);
+
+    public void RemoveLast<T>() where T : Page => Navigation.RemovePage(Navigation.NavigationStack.OfType<T>().Last());
 }

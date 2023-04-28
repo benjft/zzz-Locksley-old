@@ -1,5 +1,6 @@
 ﻿using System.Windows.Input;
 using BenJFT.Locksley.App.Services.Interfaces;
+using BenJFT.Locksley.App.Views;
 using BenJFT.Locksley.Data.Models;
 using BenJFT.Locksley.Data.Providers.Interfaces;
 
@@ -26,7 +27,7 @@ public class NewScoreSheetViewModel : BaseViewModel {
     public NewScoreSheetViewModel(
         IDataProvider<ScoreSheet> scoreSheetProvider,
         INavigationProvider navigation) {
-        _scoreSheetProvider = scoreSheetProvider;
+        _scoreSheetProvider = scoreSheetProvider; 
         _navigation = navigation;
         
         _scoreSheet = scoreSheetProvider.New();
@@ -34,6 +35,7 @@ public class NewScoreSheetViewModel : BaseViewModel {
 
     private async void CreateScoreSheet() {
         _scoreSheetProvider.Save(_scoreSheet);
-        await _navigation.Return();
+        var newPage = await _navigation.InPlace<ScoreSheetPage>();
+        newPage.ViewModel.ScoreSheet = _scoreSheet;
     }
 }

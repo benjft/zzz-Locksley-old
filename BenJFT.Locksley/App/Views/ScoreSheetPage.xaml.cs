@@ -3,9 +3,10 @@
 namespace BenJFT.Locksley.App.Views; 
 
 public partial class ScoreSheetPage : ContentPage {
+    public ScoreSheetViewModel ViewModel { get; }
     public ScoreSheetPage(ScoreSheetViewModel viewModel) {
         InitializeComponent();
 
-        BindingContext = viewModel;
+        BindingContext = ViewModel = viewModel;
     }
 }
