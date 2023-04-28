@@ -1,7 +1,11 @@
-﻿namespace BenJFT.Locksley.App.Views; 
+﻿using BenJFT.Locksley.App.ViewModels;
+
+namespace BenJFT.Locksley.App.Views; 
 
 public partial class ScoreSheetPage : ContentPage {
-    public ScoreSheetPage() {
+    public ScoreSheetPage(ScoreSheetViewModel viewModel) {
         InitializeComponent();
+
+        BindingContext = viewModel;
     }
 }
