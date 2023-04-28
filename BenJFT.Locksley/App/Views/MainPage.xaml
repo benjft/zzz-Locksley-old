@@ -6,17 +6,18 @@
              xmlns:models="clr-namespace:BenJFT.Locksley.Data.Models;assembly=BenJFT.Locksley.Data"
              x:Class="BenJFT.Locksley.App.Views.MainPage"
              x:DataType="viewModels:MainViewModel">
-
-    <StackLayout>
-        <ListView ItemsSource="{Binding ScoreSheets}">
-            <ListView.ItemTemplate>
-                <DataTemplate x:DataType="models:ScoreSheet">
-                    <TextCell Text="{Binding Title}"
-                              Detail="{Binding DateString}" />
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
-        <Button Text="+ New"
-                Command="{Binding CmdNewScoreSheet}"/>
-    </StackLayout>
+    <ContentPage.Content>
+        <StackLayout>
+            <ListView ItemsSource="{Binding ScoreSheets}">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="models:ScoreSheet">
+                        <TextCell Text="{Binding Title}"
+                                  Detail="{Binding DateString}" />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <Button Text="+ New"
+                    Command="{Binding CmdNewScoreSheet}"/>
+        </StackLayout>
+    </ContentPage.Content>
 </ContentPage>

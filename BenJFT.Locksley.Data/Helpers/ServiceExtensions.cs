@@ -8,7 +8,7 @@ namespace BenJFT.Locksley.Data.Helpers;
 public static class ServiceExtensions {
     public static IServiceCollection AddDataServices(this IServiceCollection services) {
         services.AddDatabase();
-        services.AddTransient<IDataProvider<ScoreSheet>, ScoreSheetDataProvider>();
+        services.AddSingleton<IDataProvider<ScoreSheet>, ScoreSheetDataProvider>();
         return services;
     }
 

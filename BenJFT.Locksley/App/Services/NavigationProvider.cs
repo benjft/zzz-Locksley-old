@@ -9,5 +9,10 @@ public class NavigationProvider : INavigationProvider {
         _services = services;
     }
 
-    private INavigation? Navigation => Application.Current?.MainPage?.Navigation;
+    private INavigation Navigation => Application.Current?.MainPage?.Navigation ??
+                                      throw new NullReferenceException("Failed to instantiate navigation");
+
+    public async Task Navigate<T>() where T : Page => await Navigation.PushAsync(_services.GetRequiredService<T>());
+
+    public async Task Return() => await Navigation.PopAsync();
 }
