@@ -3,9 +3,9 @@
 namespace BenJFT.Locksley.App;
 
 public partial class App {
-    public App(MainPage mainPage) {
+    public App(ScoreSheetsOverviewPage scoreSheetsOverviewPage) {
         InitializeComponent();
 
-        MainPage = new NavigationPage(mainPage);
+        MainPage = new NavigationPage(scoreSheetsOverviewPage);
     }
 }

@@ -3,10 +3,10 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewModels="clr-namespace:BenJFT.Locksley.App.ViewModels"
-             xmlns:models="clr-namespace:BenJFT.Locksley.Data.Models;assembly=BenJFT.Locksley.Data"
              x:Class="BenJFT.Locksley.App.Views.ScoreSheetPage"
-             x:DataType="viewModels:ScoreSheetViewModel">
+             x:DataType="viewModels:ScoreSheetViewModel"
+             Title="{Binding Title}">
     <ContentPage.Content>
-        
+
     </ContentPage.Content>
 </ContentPage>

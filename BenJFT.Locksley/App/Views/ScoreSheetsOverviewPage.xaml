@@ -4,11 +4,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewModels="clr-namespace:BenJFT.Locksley.App.ViewModels"
              xmlns:models="clr-namespace:BenJFT.Locksley.Data.Models;assembly=BenJFT.Locksley.Data"
-             x:Class="BenJFT.Locksley.App.Views.MainPage"
-             x:DataType="viewModels:MainViewModel">
+             x:Class="BenJFT.Locksley.App.Views.ScoreSheetsOverviewPage"
+             x:DataType="viewModels:ScoreSheetOverviewViewModel">
     <ContentPage.Content>
         <StackLayout>
-            <ListView ItemsSource="{Binding ScoreSheets}">
+            <ListView x:Name="ScoreSheets"
+                      ItemsSource="{Binding ScoreSheets}"
+                      SelectionMode="None">
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="models:ScoreSheet">
                         <TextCell Text="{Binding Title}"
@@ -17,7 +19,7 @@
                 </ListView.ItemTemplate>
             </ListView>
             <Button Text="+ New"
-                    Command="{Binding CmdNewScoreSheet}"/>
+                    Command="{Binding CmdNewScoreSheet}" />
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

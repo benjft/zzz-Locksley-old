@@ -4,15 +4,26 @@ using BenJFT.Locksley.App.Views;
 using BenJFT.Locksley.Data.Models;
 using BenJFT.Locksley.Data.Providers.Interfaces;
 
-namespace BenJFT.Locksley.App.ViewModels; 
+namespace BenJFT.Locksley.App.ViewModels;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 public class NewScoreSheetViewModel : BaseViewModel {
-    private readonly IDataProvider<ScoreSheet> _scoreSheetProvider;
     private readonly INavigationProvider _navigation;
 
     private readonly ScoreSheet _scoreSheet;
-    
+    private readonly IDataProvider<ScoreSheet> _scoreSheetProvider;
+
+    private ICommand? _cmdCreateScoreSheet;
+
+    public NewScoreSheetViewModel(
+        IDataProvider<ScoreSheet> scoreSheetProvider,
+        INavigationProvider navigation) {
+        _scoreSheetProvider = scoreSheetProvider;
+        _navigation = navigation;
+
+        _scoreSheet = scoreSheetProvider.New();
+    }
+
     public string Title {
         get => _scoreSheet.Title;
         set {
@@ -21,21 +32,10 @@ public class NewScoreSheetViewModel : BaseViewModel {
         }
     }
 
-    private ICommand? _cmdCreateScoreSheet;
     public ICommand CmdCreateScoreSheet => _cmdCreateScoreSheet ??= new Command(CreateScoreSheet);
-
-    public NewScoreSheetViewModel(
-        IDataProvider<ScoreSheet> scoreSheetProvider,
-        INavigationProvider navigation) {
-        _scoreSheetProvider = scoreSheetProvider; 
-        _navigation = navigation;
-        
-        _scoreSheet = scoreSheetProvider.New();
-    }
 
     private async void CreateScoreSheet() {
         _scoreSheetProvider.Save(_scoreSheet);
-        var newPage = await _navigation.InPlace<ScoreSheetPage>();
-        newPage.ViewModel.ScoreSheet = _scoreSheet;
+        await _navigation.InPlace<ScoreSheetPage>(p => p.ViewModel.ScoreSheet = _scoreSheet);
     }
 }
